@@ -1,0 +1,117 @@
+import "string.mx"
+
+extern def printf(c_string: *int8) -> int64
+extern def getchar() -> int8
+extern def exit(code: int64) -> void
+
+class IOBuf {
+    buf: *int64,
+}
+
+def print(s: String) {
+    let s = s.to_c_string();
+    printf(s);
+    _free(s);
+}
+
+def println(s: String) {
+    print(s);
+    print("\n");
+}
+
+def input() -> String {
+    let mut buf = String::new();
+    let mut running = true;
+    while running {
+        let c = getchar();
+        if c == (-1) as int8 || c == 10 as int8 {
+            running = false;
+        } else {
+            buf.push_char(c);
+        }
+    }
+
+    return buf;
+}
+
+def panic(s: String) {
+    let ansi_red = "\x1b[1;31m";
+    println(ansi_red + "PANIC " + s);
+    exit(1);
+}
+
+def to_string(self) for int64 -> String {
+    let mut out = String::new();
+    let mut n = self;
+
+    if n == 0 {
+        out.push_char(48 as int8);
+        return out;
+    }
+
+    let mut is_negative = false;
+
+    if n < 0 {
+        is_negative = true;
+        n = -n;
+    }
+
+    while n > 0 {
+        let digit = n % 10;
+        out.push_char((digit + 48) as int8);
+        n = n / 10;
+    }
+
+    if is_negative {
+        out.push_char(45 as int8);
+    }
+
+    out.reverse();
+
+    return out;
+}
+
+def to_string_unsigned(self) for int8 -> String {
+    let mut out = String::new();
+    let mut n = self as int64;
+
+    if n == 0 {
+        out.push_char(48 as int8);
+        return out;
+    }
+
+    if n < 0 {
+        n = 256 + n;
+    }
+
+    while n > 0 {
+        let digit = n % 10;
+        out.push_char((digit + 48) as int8);
+        n = n / 10;
+    }
+
+    out.reverse();
+
+    return out;
+}
+
+def to_string(self) for int8 -> String {
+    return (self as int64).to_string();
+}
+
+def to_string(self) for int16 -> String {
+    return (self as int64).to_string();
+}
+
+def to_string(self) for int32 -> String {
+    return (self as int64).to_string();
+}
+
+
+def to_string_unsigned(self) for int16 -> String {
+    return (self as int64).to_string();
+}
+
+def to_string_unsigned(self) for int32 -> String {
+    return (self as int64).to_string();
+}

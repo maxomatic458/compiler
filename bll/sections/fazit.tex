@@ -1,0 +1,32 @@
+\section{Fazit}
+    \subsection{Ergebnisse}
+        In meiner Sprache ist es möglich einfache, aber auch komplexe Programme zu schreiben.
+        Vor allem durch Generics und Operatorüberladung lassen sich komplexere Probleme einfacher lösen.
+
+        Es ist möglich Programme direkt als ausführbare Datei zu kompilieren, oder 
+        sie in LLVM IR kompilieren. Fehlermeldungen sind in den meisten Fällen sehr ausführlich und hilfreich.
+
+        Weil sowohl ein eigener Lexer als auch ein eigener Parser implementiert wurde,
+        ist der Compiler recht flexibel gestaltet und kann leicht erweitert oder angepasst werden.
+
+        Und während der Entwicklung konnte ich viel über Programmiersprachen und Compilerarchitektur lernen.
+
+    \subsection{Verbeserungsmöglichkeiten}
+        Es fehlen einige Features, die normalerweise in einer modernen Programmiersprache vorhanden sind:
+        \begin{itemize}
+            \item Multithreading ist nicht möglich
+            \item Es gibt keine Bitoperationen
+            \item Es gibt nur öffentliche Funktionen und Klassen
+            \item Es gibt keine Namespaces
+        \end{itemize}
+
+        Folgende Dinge könnten verbessert werden:
+        \begin{itemize}
+            \item Der IR Code wird bis zum Schluss in einer Liste gespeichert. 
+                Bei größeren Programmen wäre es sinnvoller direkt bei der Generierung den IR Code in die Datei zu schreiben. 
+            \item Der Codegenerator ist single-threaded, 
+                Multithreading könnte z.B. bei dem Importieren von Dateien oder bei der Generierung des IR Codes implementiert werden.
+            \item Eventuell könnte ich mir noch einen Namen für meine Sprache ausdenken.
+            \item Ein Rust ähnliches Trait-Bound System wäre sinnvoll, um Generics vollständig Typensicher zu machen.
+            \item Eine automatische Freigabe des Heap-Speichers ähnlich wie in Rust wäre sinnvoll (Ownership-System).
+        \end{itemize}

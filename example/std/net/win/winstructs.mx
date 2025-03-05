@@ -1,0 +1,36 @@
+import "../../io.mx"
+import "../common.mx"
+
+extern def WSAGetLastError() -> int32
+
+class STRUCT_sockaddr_in {
+    sin_family: int16,
+    sin_port: int16,
+    sin_addr: int32,
+    sin_zero: [int8; 8],
+}
+
+extern def htons(hostshort: int16) -> int16
+# https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-wsastringtoaddressa
+extern def inet_addr(i: *int8) -> int32
+
+def from_sock_addrv4(sock_addr: SockAddrV4) for STRUCT_sockaddr_in -> STRUCT_sockaddr_in {
+    let mut out = STRUCT_sockaddr_in {
+        sin_family: 2 as int16, # AF_INET
+        sin_port: htons(sock_addr.port),
+        sin_addr: 0 as int32,
+        sin_zero: [0 as int8, 0 as int8, 0 as int8, 0 as int8, 0 as int8, 0 as int8, 0 as int8, 0 as int8],
+    };
+
+    let ip = sock_addr.ip().to_c_string();
+
+    let res = inet_addr(ip);
+
+    if res as int64 == -1 {
+        panic("Failed to convert ip address");
+    }
+
+    out.sin_addr = res;
+
+    return out;
+} 

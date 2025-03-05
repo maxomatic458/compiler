@@ -1,0 +1,1089 @@
+\section{Die Sprache}
+
+    \subsection{Ziele}
+        Mein Ziel für die Sprache war es, eine recht einfache, aber dennoch feature-reiche Sprache
+        zu entwickeln. Sie sollte eine einfache, Python-ähnliche Syntax haben, aber auch
+        komplexere Konzepte wie Generics und Operatorüberladung unterstützen.
+    \subsection{Syntax \& Semantik}
+        Wie bereits erwähnt ist die Syntax weitgehend an Python angelehnt. So sieht zum Beispiel ein einfaches
+        Hello World Programm in meiner Sprache aus:
+
+        \begin{lstlisting}
+    use "std/io.mx"
+
+    def main() -> int {
+        print("Hello, World!");
+        return 0;
+    }
+        \end{lstlisting}
+
+        Wie in anderen Sprachen ist die \texttt{main} Funktion der Einstiegspunkt in ein Programm.
+        Diese muss immer vorhanden sein und muss den Rückgabetyp \texttt{int} haben. Dieser zurückgegebene Wert ist dann
+        auch der Exit-Code des Programms.
+
+        Variablen können mit dem Schlüsselwort \texttt{let} deklariert werden. Standardmäßig sind Variablen
+        nicht veränderbar. Um eine veränderbare Variable zu deklarieren, muss diese mit \texttt{let mut} deklariert
+        werden. Eine Typangabe ist immer optional.
+        \begin{lstlisting}
+    let x = 5;
+    let mut y: int = 10;
+
+    y = x + 5;
+        \end{lstlisting}
+
+        \newpage
+        Man kann auch Zeiger verwenden. Der Datentyp eines Zeigers sieht so aus: \texttt{*T}, wobei \texttt{T} der Typ des Wertes ist, 
+        auf den der Zeiger zeigt.
+        Um einen Zeiger zu erstellen, der auf einen existierenden Wert zeigt, wird das Zeichen \texttt{\&} verwendet.
+        Um den Zeiger zu dereferenzieren, wird das Zeichen \texttt{\~} verwendet.
+
+
+        \begin{lstlisting}
+    let x = 5;
+    let y = &x;
+    let z = ~y;
+    # z = 5
+        \end{lstlisting}
+    
+        % \newpage
+
+        Funktionen können mit dem Schlüsselwort \texttt{def} deklariert werden. Parameter einer Funktion
+        werden in Klammern hinter dem Namen angegeben, der Typ der Parameter muss angegeben werden. Wenn die 
+        Funktion einen Wert zurückgibt, dann muss der Rückgabetyp mit einem Pfeil \texttt{->} angegeben werden.
+
+        % \newpage
+
+        \begin{lstlisting}
+    def add(x: int, y: int) -> int {
+        return x + y;
+    }
+        \end{lstlisting}
+
+        Es gibt auch While-Schleifen und Fallunterscheidungen (if, else, else-if).
+        Ich habe mich bewusst gegen die Implementierung von For-Schleifen entschieden, weil es damit nur einen 
+        Weg gibt, eine Schleife zu durchlaufen. Dadurch ist der Code in meiner Sprache einheitlicher 
+        und einfacher zu lesen.
+
+        \begin{lstlisting}
+    let mut x = 0;
+    while x < 10 {
+        x = x + 1;
+    }
+
+    if x == 10 {
+        print("x ist 10");
+    } else if x == 5 {
+        print("x ist nicht 5");
+    } else {
+        print("x ist weder 10 noch 5");
+    }
+        \end{lstlisting}
+        \newpage
+        Es ist auch möglich, eigene Datentypen in Form von Klassen zu definieren. Dies ist mit dem Schlüsselwort
+        \texttt{class} möglich.
+
+        % \newpage
+
+        \begin{lstlisting}
+    class Vector {
+        x: int,
+        y: int,
+    }
+
+    def main() -> int {
+        let v = Vector { x: 1, y: 2 };
+        return v.x + v.y;
+    }
+        \end{lstlisting}
+
+        % \newpage
+
+        % Klassen können auch Methoden haben. Diese werden wie eine normale Funktion deklariert, nur das nach den Parametern
+        % das Schlüsselwort \texttt{for} gefolgt von dem Klassennamen steht.
+        % Wenn eine Methode einen Parameter der Klasseninstanz (\texttt{self} Parameter) hat, dann wird diese mit einem Punkt (\texttt{.})
+        % aufgerufen. Falls die Methode keinen \texttt{self} (z.B. Constructor) wird sie mit einem Doppelpunkt aufgerufen (\texttt{::})
+        
+        Klassen können auch Methoden haben. Diese werden wie eine normale Funktion deklariert, nur das 
+        nach den Parametern das Schlüsselwort \texttt{for} gefolgt von dem Klassennamen steht.
+        Wenn eine Methode einen Parameter der Klasseninstanz (\texttt{self}) besitzt, dann ruft man diese mit einem Punkt (\texttt{.}) gefolgt 
+        von dem Methodennamen auf. Ist die Methode statisch (verwendet also keinen \texttt{self} Parameter), dann wird sie mit einem Doppelpunkt (\texttt{::}) hinter dem Klassennamen aufgerufen.
+
+        % \newpage
+
+        \begin{lstlisting}
+
+    def vector_add(self, other: Vector) for Vector -> Vector {
+        return Vector { 
+            x: self.x + other.x, 
+            y: self.y + other.y 
+        };
+    }
+
+    def default() for Vector -> Vector {
+        return Vector { x: 0, y: 0 };
+    }
+        
+    def main() -> int {
+        let v1 = Vector { x: 1, y: 2 };
+        let v2 = Vector::default();
+
+        let v3 = v1.vector_add(v2);
+        return v3.x + v3.y;
+    }
+
+        \end{lstlisting}
+        \newpage
+        Methoden können auch für primitive Typen implementiert werden:
+
+        \begin{lstlisting}
+
+    def is_even(self) for int -> bool {
+        return self % 2 == 0;
+    }
+        \end{lstlisting}
+
+        % \newpage
+        
+        Andere Datein können mit dem Schlüsselwort \texttt{use} eingebunden werden.
+
+        \begin{center}
+            foo.mx
+        \end{center}
+        
+        \begin{lstlisting}
+    def foo() -> int {
+        return 5;
+    }
+
+    def bar() -> int {
+        return 10;
+    }
+        \end{lstlisting}
+
+        \begin{center}
+            main.mx
+        \end{center}
+
+        \begin{lstlisting}
+
+    use "foo.mx"
+
+    def main() -> int {
+        return foo() + bar();
+    }
+
+        \end{lstlisting}
+            
+    \subsection{Besonderheiten}
+
+        \subsubsection{Typsystem}
+
+        Ich habe mich für ein statisches Typsystem entschieden, weil dadurch schon beim Kompilieren
+        viele Fehler gefunden werden können. Typen von Variablen und Argumenten können vom Compiler 
+        fast immer ermittelt werden, und sollte man irgendwo einen falschen Typen verwenden, wird ein präziser
+        Fehler\footnote{Codeverweis Parserfehler: \texttt{src/parser/error.rs}} ausgegeben, der auf die Stelle im Code hinweist, wo der Fehler gemacht wurde.
+
+        \begin{lstlisting}
+            
+    def main() -> int {
+        let x = 5;
+        let y = 1.0;
+        return x + y;
+    }
+
+        \end{lstlisting}
+        
+        % \newpage
+
+        Dieser Code würde beim Kompilieren zu diesem Fehler führen:
+    
+        \begin{lstlisting}
+    error[5]: wrong type
+    example:4:20
+        
+      2 let x = 5;
+      3 let y = 1.0;
+      4 return x + y;
+               ^^^^^ expected: "int", got: "float"
+
+    Error:
+        0: compiler error: 5
+            \end{lstlisting}
+
+        Typen müssen immer explizit umgewandelt werden, 
+        \emph{Type Coercion}\footnote{Type Coercion: Automatische Umwandlung von Typen 
+        \url{https://developer.mozilla.org/en-US/docs/Glossary/Type_coercion}} 
+        gibt es daher nicht. Man würde den Code also so schreiben:
+        \begin{lstlisting}
+    def main() -> int {
+        let x = 5;
+        let y = 1.0;
+        return x + (y as int);
+    }
+        \end{lstlisting}
+
+        \subsubsection{Generics}
+
+        In meiner Sprache ist es möglich, generische Datentypen zu verwenden.
+        Funktionen können auch generisch sein:
+        \newpage
+        \begin{lstlisting}
+    def echo<T>(x: T) -> T {
+        return x;
+    }
+
+    def main() -> int {
+        return echo(5);
+    }
+        \end{lstlisting}
+
+        % \newpage
+
+        Und auch Klassen und deren Methoden können generisch sein:
+
+        \begin{lstlisting}
+    class Vector<T> {
+        x: T,
+        y: T,
+    }
+
+    def invert<T>(self) for Vector<T> {
+        self.x = self.y;
+        self.y = self.x;
+    }
+
+        \end{lstlisting}
+
+        Generische Typen können vom Compiler fast immer ermittelt werden.
+        Ausnahmen sind Funktionen oder Methoden, die den generischen Parameter nicht
+        als Parameter verwenden. In diesem Fall muss der generische Typ in spitzen klammern (\texttt{<T>}) 
+        vor den Argumenten angegeben werden.
+        
+        \begin{lstlisting}
+    def new<T>() for List -> List<T> {
+        ...
+    } 
+
+    def main() -> int {
+        let list = List::new<int>();
+        return 0;
+    }
+
+        \end{lstlisting}
+
+        % \newpage
+
+        \subsubsection{Operatorüberladung}
+        In meiner Sprache ist es auch möglich Operatoren zu überladen. 
+        Dazu muss eine Methode mit einem speziellen Namen, der dann einem Operator zugeordnet wird, definiert werden.
+
+        \newpage
+        \begin{lstlisting}
+
+    def add(self, other: Vector<int>) for Vector<int> 
+    -> Vector<int> {
+        return Vector { 
+            x: self.x + other.x, 
+            y: self.y + other.y 
+        };
+    }
+
+        \end{lstlisting}
+
+
+        Es ist auch möglich, die Operatoren von primitiven Datentypen zu überladen:
+
+        \begin{lstlisting}
+    def add(self, other: int) for int -> int {
+        return 4;
+    }
+        \end{lstlisting}
+
+        Es können auch Generics verwendet werden:
+
+        \begin{lstlisting}
+    def idx<T>(self, index: int) for List<T> {
+        ...
+    }
+        \end{lstlisting}
+        
+        \subsubsection{Aufruf von C Funktionen}
+
+        In meiner Sprache können alle Funktion der C Standardbibliothek 
+        (\emph{libc}\footnote{libc: C Standardbibliothek \url{https://de.wikipedia.org/wiki/C-Standard-Bibliothek}})
+        verwendet werden. Je nach Betriebssystem varriert der Umfang der Funktionen. Auf Windows können zum Beispiel Funktionen
+        der \emph{Windows API}\footnote{Windows API: Windows Programmierschnittstelle \url{https://de.wikipedia.org/wiki/Windows_API}}
+        verwendet werden.
+
+        
+        Dadurch ist es möglich, Funktionen zur Speicherverwaltung (\texttt{malloc}, \texttt{free}), Dateioperationen (\texttt{fopen}, \texttt{fclose}) und zur 
+        Ein- und Ausgabe (\texttt{printf}, \texttt{scanf}) zu verwenden.
+        
+        Um eine externe C Funktion nutzen zu können, wird eine Funktion mit dem Schlüsselwort \texttt{extern} deklariert.
+        Der Funktionskörper wird dabei nicht angegeben, sondern nur die Signatur der Funktion. Generics werden dabei nicht unterstützt.
+        
+        Im folgenden Beispiel handelt es sich um die Windows Funktion \texttt{Sleep}\footnote{Windows Sleep Funktion: \url{https://learn.microsoft.com/de-de/windows/win32/api/synchapi/nf-synchapi-sleep}}.
+        
+        \begin{lstlisting}
+            
+    extern def Sleep(s: int) -> void;
+    
+    def main() -> int {
+        Sleep(1000);
+        return 0;
+    }
+                
+        \end{lstlisting}
+            
+        % \newpage
+        
+        Durch den Aufruf von C Funktionen ist es möglich, Datentypen mit variabler Größe (also im Heap allokiert) zu erstellen.
+
+        \begin{lstlisting}
+
+    extern def calloc(num: int, size: int) -> int
+
+    def _calloc<T>(num: int) -> *T {
+        return calloc(num, sizeof(T)) as *T;
+    }
+
+    class List<T> {
+        ...
+    }
+
+    def new<T>() for List -> List<T> {
+        let DEFAULT_CAP = 16;
+        return List {
+            data: _calloc<T>(DEFAULT_CAP * size_of(T)),
+            len: 0,
+            cap: DEFAULT_CAP,
+        }
+    }
+
+        \end{lstlisting}
+        \subsubsection{Makros}
+
+        Es gibt in meiner Sprache auch Makros, diese werden während dem Kompilieren zu Code umgewandelt.
+        Diese Makros sind nicht vom Benutzer definierbar, lassen sich allerdings im Code des Compilers 
+        recht einfach hinzufügen.
+
+        Ein Listen Makro könnte zum Beispiel folgenden Code erzeugen:
+
+        \begin{lstlisting}
+    let list = list![1, 2, 3];
+        \end{lstlisting}
+
+        wird zu:
+
+        \begin{lstlisting}
+    let list = {
+        List::new<int>();
+        list.push(1);
+        list.push(2);
+        list.push(3);
+        return list;
+    }
+        \end{lstlisting}
+
+    Um ein Makro verwenden zu können, kann man im Compiler Bedingungen in Form von benötigten Klassen, Funktionen oder Methoden 
+    angeben. In dem oben gezeigten Beispiel wären die Bedingugen, dass es eine Klasse \texttt{List} mit den Methoden \texttt{new} und \texttt{push} gibt.
+
+    Dadurch sind Datentypen wie z.B. Strings in der Sprache selbst definiert.
+
+    \subsection{Beispielprogramme \symbol{38} Vergleich mit anderen Sprachen}
+        \subsubsection{Bekannte Algorithmen}
+    Im folgenden Abschnitt werden einige bekannte Algorithmen in meiner
+    Sprache implementiert und mit den Programmiersprachen C++ und Python verglichen.
+    Im Anschluss wird eine Laufzeitanalyse durchgeführt, hierbei wird auch 
+    die absolute Laufzeit in Millisekunden verglichen.
+    Die Implementierungen in Python befinden sich im Anhang.
+    
+    \begin{center}
+        \textbf{Bubble Sort (in Place)}
+    \end{center}
+
+    \begin{center}
+        C++
+    \end{center}
+
+        \begin{lstlisting}
+    void bubbleSort(std::vector<int>& arr) {
+        int n = arr.size();
+        for (int i = 0; i < n - 1; ++i) {
+            for (int j = 0; j < n - i - 1; ++j) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+        \end{lstlisting}
+        \newpage
+
+        \begin{center}
+            Meine Sprache
+        \end{center}
+        \begin{lstlisting}
+
+    def bubble_sort(list: *List<int>) {
+        let mut list = ~list;
+        let n = list.len;
+        let mut i = 0;
+        while i < n - 1 {
+            let mut j = 0;
+            while j < n - i - 1 {
+                if list[j] > list[j + 1] {
+                    let temp = list[j];
+                    list[j] = list[j + 1];
+                    list[j + 1] = temp;
+                }
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+    }
+
+        \end{lstlisting}
+
+        \begin{center}
+            \textbf{Fibonacci-Algorithmus (rekursiv)}
+        \end{center}
+
+        \begin{center}
+            C++
+        \end{center}
+
+        \begin{lstlisting}
+    int fibonacci(int n) {
+        if (n <= 1) {
+            return n;
+        }
+
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+        \end{lstlisting}
+        \newpage
+        \begin{center}
+            Meine Sprache
+        \end{center}
+
+        \begin{lstlisting}
+    def fibonacci(n: int) -> int {
+        if n <= 1 {
+            return n;
+        }
+
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+        \end{lstlisting}
+
+        \begin{center}
+            \textbf{Matrizenmultiplikation}
+        \end{center}
+
+        \begin{center}
+            C++
+        \end{center}
+
+        \begin{lstlisting}
+    typedef std::vector<std::vector<int>> matrix;
+
+    int matrix_multiply(matrix a, matrix b, matrix c) {
+        int i, j, k;
+        int sum;
+        int n = a.size();
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+                sum = 0;
+                for (k = 0; k < n; k++) {
+                    sum += a[i][k] * b[k][j];
+                }
+                c[i][j] = sum;
+            }
+        }
+        return 0;
+    }
+        \end{lstlisting}
+        \newpage
+        \begin{center}
+            Meine Sprache
+        \end{center}
+
+        \begin{lstlisting}
+    def matrix_multiplicaton(a: *List<List<int>>, b: *List<List<int>>) 
+    -> List<List<int>> {
+        let mut result = List::new<List<int>>();
+    
+        let a = ~a;
+        let b = ~b;
+    
+        let n = a.len;
+        let m = b[0].len;
+        let p = b.len;
+    
+        let mut i = 0;
+        while i < n {
+            let mut row = List::new<int>();
+            let mut j = 0;
+            while j < m {
+                let mut sum = 0;
+                let mut k = 0;
+                while k < p {
+                    sum = sum + a[i][k] * b[k][j];
+                    k = k + 1;
+                }
+                row.push<int>(sum);
+                j = j + 1;
+            }
+            result.push<List<int>>(row);
+            i = i + 1;
+        }
+    
+        return result;
+    } 
+        \end{lstlisting}
+
+
+        \subsubsection{Laufzeitanalyse}
+        Nun werden die oben gezeigten Algorithmen mit der erwarteten und 
+        tatsächlichen Laufzeit verglichen. Es wird auch die absolute Laufzeit in Millisekunden
+        verglichen. 
+        Um die Zeit zu messen, wird vor und nach Aufruf der Funktion die Zeit
+        durch die WinAPI Funktion (C++ und meine Sprache) \texttt{GetSystemTimeAsFileTime} 
+        \footnote{GetSystemTimeAsFileTime Funktion
+        \url{https://learn.microsoft.com/de-de/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimeasfiletime}}
+        bzw. durch die Funktion \texttt{time.time()} in Python gemessen.
+        Die Tests werden auf dem \texttt{AMD Ryzen 7 3700X (16) @ 3.6GHz} Prozessor durchgeführt.
+
+        Angaben in Millisekunden. Programme in C++ und in meiner Sprache wurden mit 
+        \texttt{clang++}
+        \footnote{Clang Compiler toolchain \url{https://de.wikipedia.org/wiki/Clang}}
+        auf der höchsten Optimierungsstufe kompiliert. 
+        Die Python Programme wurden mit \texttt{Python 3.10.11} ausgeführt.
+        \newpage
+
+        \begin{center}
+            \textbf{Bubble Sort (Worst Case, Listen sind absteigend sortiert)}
+        \end{center}
+
+        \begin{center}
+            % create a table, with the columns: N, C++, Meine Sprache, Prozentuale Differenz
+            \begin{tabular}{|c|c|c|c|}
+                \hline
+                N & C++ & Python & Meine Sprache \\
+                \hline
+                1000 & 1 & 56 & 1 \\
+                2000 & 1 & 230 & 3  \\
+                3000 & 2 & 527 & 8  \\
+                4000 & 5 & 945 & 14  \\
+                ... & ... & ... & ... \\
+                20000 & 95 & 24531 & 331  \\
+                \hline
+            \end{tabular}
+        \end{center}
+            % create a plot from a csv
+            % the csv file has 4 columns: N, C++, Python, Meine Sprache
+            % N should be the x-axis, the other columns the y-axis
+
+            \begin{adjustwidth}{-2cm}{-1cm}  % adjust the margins as needed
+                \noindent
+                \begin{minipage}{0.32\textwidth}
+                    \begin{tikzpicture}
+                        \begin{axis}[
+                            xlabel=N,
+                            ylabel=Zeit in ms,
+                            legend pos=north west,
+                        ]
+                        \addplot[red, no markers] table [x=N, y=C++, col sep=comma] {data/bubble-sort.csv};
+                        \legend{C++}
+                        \end{axis}
+                    \end{tikzpicture}
+                \end{minipage}
+                % \hfill
+                \hspace{5cm}
+                \begin{minipage}{0.32\textwidth}
+                    \begin{tikzpicture}
+                        \begin{axis}[
+                        ]
+                        \addplot[green, no markers] table [x=N, y=Python, col sep=comma] {data/bubble-sort.csv};
+                        \legend{Python}
+                        \end{axis}
+                    \end{tikzpicture}
+                \end{minipage}
+                \hfill
+            \end{adjustwidth}
+            
+            \begin{adjustwidth}{2.5cm}{-1cm}  % adjust the margins as needed
+                
+                \begin{minipage}{0.32\textwidth}
+                    \begin{tikzpicture}
+                        \begin{axis}[
+                            xlabel=N,
+                            ylabel=Zeit in ms,
+                            legend pos=north west,
+                            ]
+                            \addplot[blue, no markers] table [x=N, y=Meine Sprache, col sep=comma] {data/bubble-sort.csv};
+                            \legend{Meine Sprache}
+                        \end{axis}
+                    \end{tikzpicture}
+                \end{minipage}
+            \end{adjustwidth}
+
+        Wie erwartet, hat der Bubble Sort Algorithmus in allen Sprachen eine quadratische Laufzeit \(\mathcal{O}(n^2)\).
+        Wenn die absolute Laufzeit des C++ Programm als Basiswert (also 100 \%) genommen wird, dann liegt die prozentuale Laufzeit
+        meiner Sprache bei 348,21 \%. Die prozentuale Laufzeit von Python liegt bei 25822,10 \%. 
+
+        Weil sich C++ und meine Sprache zu LLVM-IR kompilieren lassen, kann man sich nun anschauen, warum meine Sprache langsamer
+        ist als C++.
+        Um Platz zu sparen, wurde die IR an manchen Stellen gekürzt.
+
+        \begin{center}
+            \textbf{Bubble Sort LLVM-IR}
+        \end{center}
+
+        \begin{center}
+            C++ 
+        \end{center}
+
+        \begin{lstlisting}[basicstyle=\tiny, numbers=left]
+            define dso_local void @bubbleSort(ptr %0) #2 {
+                %2 = alloca ptr, align 8
+                %3 = alloca i32, align 4
+                %4 = alloca i32, align 4
+                %5 = alloca i32, align 4
+                %6 = alloca i32, align 4
+                store ptr %0, ptr %2, align 8
+                %7 = load ptr, ptr %2, align 8
+                %8 = call i64 @"vector.size"(ptr %7) #2
+                %9 = trunc i64 %8 to i32
+                store i32 %9, ptr %3, align 4
+                store i32 0, ptr %4, align 4
+                br label %10
+              
+                ...
+
+                ret void
+              }
+
+              attributes #2 = { ... }
+        \end{lstlisting}
+
+        \begin{center}
+            Meine Sprache
+        \end{center}
+
+        % as there is a lot of IR, we need to use a smaller font size
+        \begin{lstlisting}[basicstyle=\tiny, numbers=left]
+    define void @bubble_sort(%List--int* %_list)  {
+    entry:
+        %_list_0 = alloca %List--int*
+        store %List--int* %_list, %List--int** %_list_0
+
+        ...
+
+        %_845 = alloca i64
+        %_760 = alloca i64
+        %_777 = alloca i64
+        %_785 = alloca i64
+        %_temp_789 = alloca i64
+        %_809 = alloca i64
+        %_817 = alloca i64
+        %_824 = alloca i64
+        %_832 = alloca i64
+        %_839 = alloca i64
+        %_j_749 = alloca i64
+        %_751 = alloca i64
+        %_745 = alloca i64
+        br label %while_head_748
+            
+        ...
+
+        ret void
+}
+
+        \end{lstlisting}
+
+    Zunächst ist zu sehen, dass in meiner Sprache mehr Speicher allokiert wird als in C++.
+    In meiner Sprache werden 13 Variablen allokiert (Z. 8-20), in C++ nur 5 (Z. 2-6).
+    In der C++ IR werden auch Funktionsaufrufe mit Attributen 
+    \footnote{Funktionsattribute in LLVM \url{https://llvm.org/docs/LangRef.html\#attribute-groups}}
+    versehen. Dadurch können Funktionen beim Kompilieren optimiert werden, z.B. durch spezifische Optimierung für spezifische Prozessorarchitekturen.
+    Mein Compiler unterstützt dies nicht.
+
+    Werden diese Attribute manuell in der IR meiner Sprache hinzugefügt, dann verringert sich die relative Laufzeit von 348,21 \% auf 201,05 \%.
+    Der übrige Unterschied kommt wahrscheinlich von der effizienteren  Implementierung des C++ Vector.
+    Dieser verwendet im IR, die Funktion \texttt{llvm.memmove}, um die Daten des Vector zu kopieren.
+    In meiner Sprache wird das mit der C Funktion \texttt{memcpy} gemacht.
+
+    \newpage
+
+    \begin{center}
+        \textbf{Fibonacci-Algorithmus}
+    \end{center}
+
+    % table
+
+    \begin{center}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            N & C++ & Python & Meine Sprache \\
+            \hline
+            10 & 0 & 0 & 0 \\
+            20 & 0 & 1 & 0 \\
+            30 & 2 & 186 & 3 \\
+            40 & 296 & 23514 & 280 \\
+            50 & 36444 & - & 36085 \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+    % plots
+    \begin{adjustwidth}{-2cm}{-1cm}  % adjust the margins as needed
+        \noindent
+        \begin{minipage}{0.32\textwidth}
+            \begin{tikzpicture}
+                \begin{axis}[
+                    xlabel=N,
+                    ylabel=Zeit in ms,
+                    legend pos=north west,
+                ]
+                \addplot[red, no markers] table [x=N, y=C++, col sep=comma] {data/fibonacci.csv};
+                \legend{C++}
+                \end{axis}
+            \end{tikzpicture}
+        \end{minipage}
+        % \hfill
+        \hspace{5cm}
+        \begin{minipage}{0.32\textwidth}
+            \begin{tikzpicture}
+                \begin{axis}[
+                ]
+                \addplot[green, no markers] table [x=N, y=Python, col sep=comma] {data/fibonacci.csv};
+                \legend{Python}
+                \end{axis}
+            \end{tikzpicture}
+        \end{minipage}
+        \hfill
+
+    \end{adjustwidth}
+
+    \begin{adjustwidth}{2.5cm}{-1cm}  % adjust the margins as needed
+        
+        \begin{minipage}{0.32\textwidth}
+            \begin{tikzpicture}
+                \begin{axis}[
+                    xlabel=N,
+                    ylabel=Zeit in ms,
+                    legend pos=north west,
+                    ]
+                    \addplot[blue, no markers] table [x=N, y=Meine Sprache, col sep=comma] {data/fibonacci.csv};
+                    \legend{Meine Sprache}
+                \end{axis}
+            \end{tikzpicture}
+        \end{minipage}
+
+    \end{adjustwidth}
+
+    Der Fibonacci-Algorithmus hat in allen Sprachen eine exponentielle Laufzeit \(\mathcal{O}(2^n)\).
+    Die prozentuale relative Laufzeit (zu C++) meiner Sprache beträgt 99,96 \%.
+    Die prozentuale Laufzeit von Python beträgt 755,84 \%.
+    In diesem Fall ist meine Sprache sogar schneller als C++.
+
+    Wir betrachten nun den IR-Code um zu sehen, 
+    warum in diesem Fall meine Sprache schneller ist als C++.
+
+    \begin{center}
+        \textbf{Fibonacci-Algorithmus LLVM-IR}
+    \end{center}
+
+    \begin{center}
+        C++
+    \end{center}
+
+    \begin{lstlisting}[basicstyle=\tiny, numbers=left]
+    define dso_local noundef i32 @"fibonacci"(i32 %0) #0 {
+            %2 = alloca i32, align 4
+            %3 = alloca i32, align 4
+            store i32 %0, ptr %3, align 4
+            %4 = load i32, ptr %3, align 4
+            %5 = icmp sle i32 %4, 1
+            br i1 %5, label %6, label %8
+        6:                                                
+            %7 = load i32, ptr %3, align 4
+            store i32 %7, ptr %2, align 4
+            br label %16
+        8:                                                
+            %9 = load i32, ptr %3, align 4
+            %10 = sub nsw i32 %9, 1
+            %11 = call noundef i32 @"fibonacci"(i32 %10)
+            %12 = load i32, ptr %3, align 4
+            %13 = sub nsw i32 %12, 2
+            %14 = call noundef i32 @"fibonacci"(i32 %13)
+            %15 = add nsw i32 %11, %14
+            store i32 %15, ptr %2, align 4
+            br label %16
+
+        16:                                              
+            %17 = load i32, ptr %2, align 4
+            ret i32 %17
+    }
+
+    attributes #0 = { ... }
+
+    \end{lstlisting}
+
+    \begin{center}
+        Meine Sprache
+    \end{center}
+
+    \begin{lstlisting}[basicstyle=\tiny, numbers=left]
+    define i64 @fib(i64 %_n)  {
+        entry:
+            %_n_0 = alloca i64
+            store i64 %_n, i64* %_n_0
+            %_1 = load i64, i64* %_n_0
+            %_3 = alloca i64
+            store i64 1, i64* %_3
+            %_2 = load i64, i64* %_3
+            %_4 = icmp sle i64 %_1, %_2
+            br i1 %_4, label %if_5, label %end_if5 
+        if_5:
+            %_6 = load i64, i64* %_n_0
+            ret i64 %_6
+            br label %end_if5
+        end_if5:
+            %_11 = load i64, i64* %_n_0
+            %_13 = alloca i64
+            store i64 1, i64* %_13
+            %_12 = load i64, i64* %_13
+            %_14 = sub i64 %_11, %_12
+            %_9 = call i64 @fib(i64 %_14)
+            %_18 = load i64, i64* %_n_0
+            %_20 = alloca i64
+            store i64 2, i64* %_20
+            %_19 = load i64, i64* %_20
+            %_21 = sub i64 %_18, %_19
+            %_16 = call i64 @fib(i64 %_21)
+            %_22 = add i64 %_9, %_16
+            ret i64 %_22
+        }
+
+    \end{lstlisting}
+
+    In diesem Fall ist meine Sprache schneller, weil der Datentyp int je nach 
+    nativer Wortgröße des Prozessors unterschiedlich groß ist. Auf einem 64-Bit Prozessor 
+    wird ein \texttt{int} in meiner Sprache also 64 Bit groß sein, in C++ sind \texttt{int} 32 Bit groß.
+    Moderne Prozessoren sind für 64-Bit Operationen optimiert, daher können also Berechnungen mit 64-Bit Zahlen schneller sein.
+
+    Die folgende Tabelle zeigt die Durchschnittsmesswerte aus 10 Durchläufen des C++ Algorithmus, bei
+    denen die 47. Fibonacci-Zahl berechnet wurde.
+    Die Integer-Größe wurde im LLVM IR nachträglich geändert.
+
+    \begin{center}
+
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Integer Größe & Zeit in ms \\
+        \hline
+        32 & 8582 \\
+        64 & 8501 \\
+        \hline
+    \end{tabular}
+    \end{center}
+
+    \newpage
+    \begin{center}
+        \textbf{Matrizenmultiplikation (NxN Matrizen)}
+    \end{center}
+
+    % table
+    \begin{center}
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            N & C++ & Python & Meine Sprache \\
+            \hline
+            50 & 1 & 13 & 1 \\
+            100 & 7 & 85 & 10 \\
+            150 & 24 & 348 & 33 \\
+            200 & 56 & 748 & 90 \\
+            250 & 85 & 1346 & 169 \\
+            300 & 183 & 2491 & 322 \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+    % plots, the data file is called matrix-multiplication.csv
+
+    \begin{adjustwidth}{-2cm}{-1cm}  % adjust the margins as needed
+        \noindent
+        \begin{minipage}{0.32\textwidth}
+            \begin{tikzpicture}
+                \begin{axis}[
+                    xlabel=N,
+                    ylabel=Zeit in ms,
+                    legend pos=north west,
+                ]
+                \addplot[red, no markers] table [x=N, y=C++, col sep=comma] {data/matrix-multiplication.csv};
+                \legend{C++}
+                \end{axis}
+            \end{tikzpicture}
+        \end{minipage}
+        % \hfill
+        \hspace{5cm}
+        \begin{minipage}{0.32\textwidth}
+            \begin{tikzpicture}
+                \begin{axis}[
+                ]
+                \addplot[green, no markers] table [x=N, y=Python, col sep=comma] {data/matrix-multiplication.csv};
+                \legend{Python}
+                \end{axis}
+            \end{tikzpicture}
+        \end{minipage}
+        \hfill
+
+    \end{adjustwidth}
+
+    \begin{adjustwidth}{2.5cm}{-1cm}  % adjust the margins as needed
+        
+        \begin{minipage}{0.32\textwidth}
+            \begin{tikzpicture}
+                \begin{axis}[
+                    xlabel=N,
+                    ylabel=Zeit in ms,
+                    legend pos=north west,
+                    ]
+                    \addplot[blue, no markers] table [x=N, y=Meine Sprache, col sep=comma] {data/matrix-multiplication.csv};
+                    \legend{Meine Sprache}
+                \end{axis}
+            \end{tikzpicture}
+        \end{minipage}
+
+    \end{adjustwidth}
+
+    Wie erwartet hat die Matrizenmultiplikation in allen Sprachen eine kubische Laufzeit \(\mathcal{O}(n^3)\).
+    Die prozentuale relative Laufzeit (zu C++) meiner Sprache beträgt 181,42 \%.
+    Die Laufzeit von Python beträgt 1361,20 \%.
+
+    \begin{center}
+        \textbf{Matrizenmultiplikation LLVM-IR}
+    \end{center}
+
+    \begin{center}
+        C++
+    \end{center}
+
+    \begin{lstlisting}[basicstyle=\tiny, numbers=left]
+
+    define dso_local i32 @matrix_multiply(ptr %0, ptr %1, ptr %2) # 2 {
+    entry:
+        %4 = alloca ptr, align 8
+        %5 = alloca ptr, align 8
+        %6 = alloca ptr, align 8
+        %7 = alloca i32, align 4
+        %8 = alloca i32, align 4
+        %9 = alloca i32, align 4
+        %10 = alloca i32, align 4
+        %11 = alloca i32, align 4
+        store ptr %2, ptr %4, align 8
+        store ptr %1, ptr %5, align 8
+        store ptr %0, ptr %6, align 8
+
+        ...
+
+        br label %14
+
+    14:
+        ...
+
+    28:
+        %38 = call dereferenceable(24) "vector.index"(%0, i64 %37) #12
+        ...
+        %41 = call dereferenceable(24) "vector.index"(%1, i64 %37) #12
+        %42 = load i32, ptr %41, align 4
+        %43 = mul nsw i32 %35, %42
+        %44 = load i32, ptr %10, align 4
+        %45 = add nsw i32 %44, %43
+        store i32 %45, ptr %10, align 4
+        br label %46
+    46:
+        %47 = load i32, ptr %9, align 4
+        %48 = add nsw i32 %47, 1
+        store i32 %48, ptr %9, align 4
+        br label %24, !llvm.loop !13
+    64:
+        ...
+
+        ret i32 0
+    } 
+
+    attributes #2 = { ... }
+    atributtes #12 = { ... }
+
+    \end{lstlisting}
+
+    \begin{center}
+        Meine Sprache
+    \end{center}
+
+    \begin{lstlisting}[basicstyle=\tiny, numbers=left]
+    define %List @matrix_multiplication(%List %_a, %List %_b) {
+    entry:
+        %_a_0 = alloca %List*
+        store %List* %_a, %List** %_a_0
+        %_b_0 = alloca %List*
+        store %List* %_b, %List** %_b_0
+
+        ...
+    while_body_1607:
+        %_1610 = load i64, i64* %_sum_1597
+        %_1615 = load i64, i64* %_i_1578
+        %_1619 = load i64, i64* %_i_1578
+        %_1617 = call %List* @List_Index_List_int--List(%List* %_a_1550,i64 %_1619)
+        %_1620 = load i64, i64* %_k_1600
+        %_1625 = load i64, i64* %_i_1578
+        %_1629 = load i64, i64* %_i_1578
+        %_1627 = call %List* @List_Index_List_int--List(%List* %_a_1550,i64 %_1629)
+        %_1630 = load i64, i64* %_k_1600
+        %_1622 = call i64* @List_Index_List_int--int(%List* %_1627,i64 %_1630)
+        %_1612 = load i64, i64* %_1622
+        %_1634 = load i64, i64* %_k_1600
+        %_1638 = load i64, i64* %_k_1600
+        %_1636 = call %List* @List_Index_List_int--List(%List* %_b_1554,i64 %_1638)
+        %_1639 = load i64, i64* %_j_1589
+        %_1644 = load i64, i64* %_k_1600
+        %_1648 = load i64, i64* %_k_1600
+        %_1646 = call %List* @List_Index_List_int--List(%List* %_b_1554,i64 %_1648)
+        %_1649 = load i64, i64* %_j_1589
+        %_1641 = call i64* @List_Index_List_int--int(%List--int* %_1646,i64 %_1649)
+        %_1631 = load i64, i64* %_1641
+        %_1650 = mul i64 %_1612, %_1631
+        %_1651 = add i64 %_1610, %_1650
+        store i64 %_1651, i64* %_sum_1597
+        ...
+    end_while_1596:
+        %_1676 = load %List--List--int, %List--List--int* %_result_1547
+        ret %List--List--int %_1676
+    }
+
+    \end{lstlisting}
+
+    Meine Sprache ist hier wieder langsamer als C++. Dies liegt erneut an den Funktionsattributen, aber auch an der Anzahl der Anweisungen, die durchgeführt werden. In C++ werden 15 Anweisungen (Z. 24f) benötigt, 
+    um das Produkt beider Matrixelemente zu berechnen, in meiner Sprache sind es 30 (Z. 10f).
+    Mein Compiler erzeugt IR, die an vielen Stellen mehr Anweisungen verwendet als absolut nötig.
+
+    
+
+
+
+    
+
+
+
+
+    
+
+
+ 
+    

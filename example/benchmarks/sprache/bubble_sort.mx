@@ -1,0 +1,19 @@
+import "../../std/collections/list.mx"
+
+def bubble_sort(list: *List<int>) {
+    let mut list = ~list;
+    let n = list.len;
+    let mut i = 0;
+    while i < n - 1 {
+        let mut j = 0;
+        while j < n - i - 1 {
+            if list[j] > list[j + 1] {
+                let temp = list[j];
+                list[j] = list[j + 1];
+                list[j + 1] = temp;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}

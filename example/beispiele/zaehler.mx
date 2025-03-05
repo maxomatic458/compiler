@@ -1,0 +1,54 @@
+import "../std/io.mx"
+
+class Zaehler {
+    zahl: int64,
+} 
+
+def erhoehen(self) for Zaehler {
+    self.zahl = self.zahl + 1;
+}
+
+def verringern(self) for Zaehler {
+    self.zahl = self.zahl - 1;
+}
+
+def wert(self) for Zaehler -> int64 {
+    return self.zahl;
+}
+
+def neu(start: int64) for Zaehler -> Zaehler {
+    return Zaehler {
+        zahl: start,
+    }
+}
+
+def main() -> int64 {
+    let z1 = Zaehler::neu(0);
+
+    z1.erhoehen();
+
+    # standardmäßig wird z1 kopiert (also nicht referenziert)
+    let z2 = z1;
+
+    z1.erhoehen();
+
+    println("Z1: " + z1.wert().to_string()); # 2
+    println("Z2: " + z2.wert().to_string()); # 1
+
+    let z1 = Zaehler::neu(0);
+
+    z1.erhoehen();
+
+    # z1 wird referenziert
+    let z2 = &z1;
+
+    # z2 wird dereferenziert und methode aufgerufen
+    (~z2).erhoehen();
+
+    let z2 = ~z2;
+
+    println("Z1: " + z1.wert().to_string()); # 2
+    println("Z2: " + z2.wert().to_string()); # 2
+
+    return 0;
+}

@@ -1,0 +1,113 @@
+import "collections/list.mx"
+
+class String {
+    list: List<int8>,
+}
+
+def new() for String -> String {
+    return String {
+        list: List::new<int8>(),
+    }
+}
+
+def len(self) for String -> int64 {
+    return self.list.len;
+}
+
+def with_capacity(cap: int64) for String -> String {
+    return String {
+        list: List::with_capacity<int8>(cap),
+    }
+}
+
+def push_char(self, c: int8) for String {
+    self.list.push(c);
+}
+
+def idx_i8(self, index: int64) for String -> int8 {
+    return self.list[index];
+}
+
+def idx(self, index: int64) for String -> *String {
+    let mut out = String::new();
+    out.push_char(self.idx_i8(index));
+    return &out;
+}
+
+def to_c_string(self) for String -> *int8 {
+    let mut out = String::with_capacity(self.len() + 1);
+    let mut i = 0;
+    while i < self.len() {
+        out.push_char(self.idx_i8(i));
+        i = i + 1;
+    }
+    out.push_char(0 as int8);
+    return out.list.data;
+}
+
+def add(self, other: String) for String -> String {
+    let mut out = String::with_capacity(self.len() + other.len());
+    let mut i = 0;
+    while i < self.len() {
+        out.push_char(self.idx_i8(i));
+        i = i + 1;
+    }
+    i = 0;
+    while i < other.len() {
+        out.push_char(other.idx_i8(i));
+        i = i + 1;
+    }
+    return out;
+}
+
+def reverse(self) for String {
+    self.list.reverse();
+}
+
+def eq(self, other: String) for String -> bool {
+    if self.len() != other.len() {
+        return false;
+    }
+
+    let mut i = 0;
+    while i < self.len() {
+        if self.idx_i8(i) != other.idx_i8(i) {
+            return false;
+        }
+        i = i + 1;
+    }
+
+    return true;
+}
+
+def split(self, c: int8) for String -> List<String> {
+    let mut out = List::new<String>();
+    let mut current = String::new();
+    let mut i = 0;
+    while i < self.len() {
+        let current_char = self.idx_i8(i);
+        if current_char == c {
+            out.push(current);
+            current = String::new();
+        } else {
+            current.push_char(current_char);
+        }
+        i = i + 1;
+    }
+    out.push(current);
+    return out;
+}
+
+def parse_int(self) for String -> int64 {
+    let mut out = 0;
+    let mut i = 0;
+    while i < self.len() {
+        let current_char = self.idx_i8(i);
+        if ((current_char as int64 < 48) || (current_char as int64 > 57)) {
+            return -1;
+        }
+        out = out * 10 + (current_char as int64 - 48);
+        i = i + 1;
+    }
+    return out;
+}

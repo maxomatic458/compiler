@@ -1,0 +1,90 @@
+import "../std/io.mx"
+
+# damit man die liste printen kann
+def to_string(self) for List<String> -> String {
+    let mut out = String::new();
+    out = out + "[";
+
+    let mut i = 0;
+    while i < self.len {
+        out.push_char(34 as int8); # '"'
+        out = out + self[i];
+        out.push_char(34 as int8); # '"'
+        if i < self.len - 1 {
+            out = out + ", ";
+        }
+        i = i + 1;
+    }
+
+    out = out + "]";
+
+    return out;
+}
+
+
+class Kartenhand {
+    karten_liste: List<String>,
+    anzahl: int64,
+}
+
+def new() for Kartenhand -> Kartenhand {
+    return Kartenhand {
+        karten_liste: List::new<String>(),
+        anzahl: 0,
+    }
+}
+
+def hinzufuegen(self, karte: String) for Kartenhand {
+    self.karten_liste.push(karte);
+    self.anzahl = self.anzahl + 1;
+}
+
+def wegnehmen(self, karte: String) for Kartenhand {
+    let mut to_remove = -1;
+
+    let mut i = 0;
+    let mut found = false;
+    while i < self.karten_liste.len && found == false {
+        if self.karten_liste[i] == karte {
+            to_remove = i;
+            found = true;
+        }
+        i = i + 1;
+    }
+
+    if to_remove == -1 {
+        panic("Karte nicht gefunden");
+    }
+
+    self.karten_liste.remove(to_remove);
+    self.anzahl = self.anzahl - 1;
+}
+
+def main() -> int64 {
+    let mut hand = Kartenhand::new();
+
+    println("hand: " + hand.karten_liste.to_string());
+    println("anzahl: " + hand.anzahl.to_string());
+
+    # Herz 10
+    hand.hinzufuegen("H-10");
+    # Kreuz Ass
+    hand.hinzufuegen("X-A"):
+
+    println("hand: " + hand.karten_liste.to_string());
+    println("anzahl: " + hand.anzahl.to_string());
+
+    # Karte entfernen
+
+    hand.wegnehmen("H-10"):
+
+    println("hand: " + hand.karten_liste.to_string());
+    println("anzahl: " + hand.anzahl.to_string());
+
+    # Karte entfernen die nicht vorhanden ist
+
+    hand.wegnehmen("H-A");
+
+
+    return 0;
+}

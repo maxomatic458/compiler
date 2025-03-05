@@ -1,0 +1,111 @@
+
+import "../common.mx"
+import "./winstructs.mx"
+# https://learn.microsoft.com/de-de/windows/win32/api/winsock2/nf-winsock2-socket
+extern def socket(af: int32, type: int32, protocol: int32) -> int64
+
+# https://learn.microsoft.com/de-de/windows/win32/api/winsock/nf-winsock-recv
+extern def recv(fd: int64, buf: *int8, len: int64, flags: int32) -> int32
+
+# https://learn.microsoft.com/en-us/windows/win32/winsock/connecting-to-a-socket
+extern def connect(fd: int64, sockaddr: *int8, len: int32) -> int32
+
+# https://learn.microsoft.com/de-de/windows/win32/api/winsock2/nf-winsock2-send
+extern def send(fd: int64, buf: *int8, len: int64, flags: int32) -> int32
+
+# https://learn.microsoft.com/de-de/windows/win32/api/winsock/nf-winsock-bind
+extern def bind(fd: int64, sockaddr: *STRUCT_sockaddr_in, len: int32) -> int32
+
+# lpWSAData *WSADATA
+extern def WSAStartup(wVersionRequested: int16, lpWSAData: int64) -> int64
+
+
+class UdpSocket {
+    fd: int64,
+    local_addr: SockAddrV4,
+}
+
+def init_fd() for UdpSocket -> int64 {
+    let af = 2; # AF_INET4
+    let type = 2; # SOCK_DGRAM
+    let protocol = 17; # IPPROTO_UDP
+
+    let wsa_ver = 34 as int16; # MAKEWORD(2, 2) 0b 0010 0010 
+    let wsa_data = malloc(400);
+
+    let res = WSAStartup(wsa_ver, wsa_data);
+
+    if res != 0 {
+        panic("Failed to initialize Winsock, error code: " + res.to_string());
+    }
+
+    let fd = socket(af as int32, type as int32, protocol as int32);
+
+    if fd == -1 {
+        # https://learn.microsoft.com/en-us/windows/win32/winsock/windows-sockets-error-codes-2
+        let err = WSAGetLastError();
+        panic("Failed to create socket " + err.to_string());
+    }
+
+    return fd;
+}
+
+def bind(sock_addr: SockAddrV4) for UdpSocket -> UdpSocket {
+    let fd = UdpSocket::init_fd();
+
+    let sock_addr_in: STRUCT_sockaddr_in = STRUCT_sockaddr_in::from_sock_addrv4(sock_addr);
+
+    let res = bind(fd, &sock_addr_in, size_of(STRUCT_sockaddr_in) as int32);
+
+    if res as int64 == -1 {
+        let err = WSAGetLastError();
+        panic("Failed to bind socket " + err.to_string());
+    }
+
+    return UdpSocket {
+        fd: fd,
+        local_addr: sock_addr,
+    };
+}
+
+def connect(remote: SockAddrV4) for UdpSocket -> UdpSocket {
+    let fd = UdpSocket::init_fd();
+
+    let sock_addr_in: STRUCT_sockaddr_in = STRUCT_sockaddr_in::from_sock_addrv4(remote);
+
+    let res = connect(fd, (&sock_addr_in) as *int8, size_of(STRUCT_sockaddr_in) as int32);
+
+    if res as int64 == -1 {
+        let err = WSAGetLastError();
+        panic("Failed to connect to remote " + err.to_string());
+    }
+
+    return UdpSocket {
+        fd: fd,
+        local_addr: SockAddrV4::from_string("0.0.0.0:0"),
+    };
+}
+
+def recv(self, buf: *int8, len: int64) for UdpSocket -> int32 {
+    let res = recv(self.fd, buf, len, 0 as int32);
+
+    if res as int64 == -1 {
+        let err = WSAGetLastError();
+        panic("Failed to receive data " + err.to_string());
+    } else if res as int64 == 0 {
+        panic("Connection closed");
+    }
+
+    return res;
+}
+
+def send(self, buf: *int8, len: int64) for UdpSocket -> int32 {
+    let res = send(self.fd, buf, len, 0 as int32);
+
+    if res as int64 == -1 {
+        let err = WSAGetLastError();
+        panic("Failed to send data " + err.to_string());
+    }
+
+    return res;
+}

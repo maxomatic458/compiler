@@ -1,0 +1,30 @@
+import "../../std/io.mx"
+import "../../std/net/win/udp.mx"
+
+# auf windows:
+# muss mit ws2_32.lib gelinkt werden
+# clang out.ll -lws2_32
+
+def main() -> int64 {
+    let bind_addr = SockAddrV4::from_string("0.0.0.0:50002");
+
+    let sock = UdpSocket::bind(bind_addr);
+
+    let mut buf = List::with_capacity<int8>(1024);
+
+    while true {
+        let len = sock.recv(buf.data, buf.cap);
+        
+        let mut i = 0;
+        let mut out = String::new();
+        while i < len as int64 {    
+            out.push_char(buf[i]);
+            i = i + 1;
+        }
+
+        println("Nachricht erhalten: " + out);
+        _free(out.list.data);
+    }
+
+    return 0;
+}

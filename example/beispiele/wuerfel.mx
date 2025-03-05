@@ -1,0 +1,34 @@
+import "../std/io.mx"
+import "../std/time.mx"
+import "../std/rand.mx"
+
+class Wuerfel {
+    zahl: int64
+}
+
+def werfen(self) for Wuerfel {
+    self.zahl = rand_int(1, 6);
+}
+
+def get_augen(self) for Wuerfel -> int64 {
+    return self.zahl;
+}
+
+def neu() for Wuerfel -> Wuerfel {
+    return Wuerfel {
+        zahl: 0,
+    }
+} 
+
+def main() -> int64 {
+    seed(unix_millis());
+
+    let w1 = Wuerfel::neu();
+    println("Wuerfel 1: " + w1.get_augen().to_string());
+    w1.werfen();
+    println("Wuerfel 1: " + w1.get_augen().to_string());
+    w1.werfen();
+    println("Wuerfel 1: " + w1.get_augen().to_string());
+
+    return 0; 
+}

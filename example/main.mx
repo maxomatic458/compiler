@@ -1,0 +1,17 @@
+import "std/io.mx"
+
+
+def eq(self, other: int64) for int8 -> bool {
+    return self as int64 == other;
+}
+
+def main() -> int64 {
+    let num = 2 as int8;
+    if num == 1 {
+        println("1 == 1");
+    } else {
+        println("1 != 1");
+    }
+
+    return 0;
+}

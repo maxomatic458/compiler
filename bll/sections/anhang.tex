@@ -1,0 +1,120 @@
+\section{Anhang}
+
+    Zugehöriges Github Repository: \url{https://github.com/maxomatic458/compiler}
+    
+
+    \noindent Sonstige Quellen:
+    \begin{itemize}
+        \item \url {https://mapping-high-level-constructs-to-llvm-ir.readthedocs.io/en/latest/} (19.06.2024)
+        \item \url {https://github.com/jDomantas/plank/} (19.06.2024)
+        \item \url {https://youtu.be/apFUyLupFgE?si=unRU7SobjeODhn_d} (19.06.2024)
+        \item \url {https://llvm.org/docs/LangRef.html} (19.06.2024)
+        \item \url {https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl03.html} (19.06.2024)
+        \item \url {https://de.wikipedia.org/wiki/Compiler} (19.06.2024)
+        \item \url {https://github.com/llvm/llvm-project} (19.06.2024)
+        \item \url {https://en.wikipedia.org/wiki/Operator-precedence_parser} (20.06.2024)
+    \end{itemize}
+
+    \noindent Ebenfalls wurden folgende Werkzeuge verwendet:
+    \begin{itemize}
+        \item rust-clippy 0.1.77 \url{https://github.com/rust-lang/rust-clippy}
+        \item typos-cli 1.15.4 \url{https://github.com/crate-ci/typos}
+        \item rustfmt 1.7.0-stable \url{https://github.com/rust-lang/rustfmt}
+        \item rust 1.77 stable \url{https://www.rust-lang.org/}
+        \item Visual Studio Code 1.90.2 \url{https://code.visualstudio.com/}
+        \item rust-analyzer v0.4.2005 (pre-release) \url{https://github.com/rust-lang/rust-analyzer}
+        \item TeX Live 2024 3.141592653 \url{https://tug.org/texlive/}
+        \item Vscode-ltex \url{https://github.com/valentjn/vscode-ltex}
+    \end{itemize}
+
+    \noindent Es wurden folgende Rust-Bibliotheken\footnote{Codeverweis: src/Cargo.toml} bei der Entwicklung verwendet:
+
+    \begin{itemize}
+        \item clap 4.4.11 \url{https://crates.io/crates/clap}
+        \item codespan-reporting \url{https://github.com/brendanzab/codespan}
+        \item color-eyre 0.6.2 \url{https://crates.io/crates/color-eyre}
+        \item derive_more 0.99.17 \url{https://crates.io/crates/derive_more}
+        \item indexmap 2.2.3 \url{https://crates.io/crates/indexmap}
+        \item itertools 0.12.0 \url{https://crates.io/crates/itertools}
+        \item lazy\_static 1.4.0 \url{https://crates.io/crates/lazy_static}
+        \item once\_cell 1.18.0 \url{https://crates.io/crates/once_cell}
+        \item phf 0.11.2 \url{https://crates.io/crates/phf}
+        \item pretty_assertions 1.4.0 \url{https://crates.io/crates/pretty_assertions}
+        \item rstest 0.18.2 \url{https://crates.io/crates/rstest}
+        \item semver 1.0.20 \url{https://crates.io/crates/semver}
+        \item serde 1.0.188 \url{https://crates.io/crates/serde}
+        \item serial_test 3.0.0 \url{https://crates.io/crates/serial_test}
+        \item strum 0.26.1 \url{https://crates.io/crates/strum}
+        \item strum\_macros 0.26.1 \url{https://crates.io/crates/strum_macros}
+        \item termcolor 1.2.0 \url{https://crates.io/crates/termcolor}
+        \item thiserror 1.0.47 \url{https://crates.io/crates/thiserror}
+        \item unescape 0.1.0 \url{https://crates.io/crates/unescape}
+        \item criterion 0.5.1 \url{https://crates.io/crates/criterion}
+    \end{itemize}
+
+    \noindent Es wurden die folgenden TeX-Pakete verwedet:
+
+    \begin{itemize}
+        \item babel \url{https://ctan.org/pkg/babel}
+        \item upquote \url{https://ctan.org/pkg/upquote}
+        \item listings \url{https://ctan.org/pkg/listings}
+        \item inconsolata \url{https://ctan.org/pkg/inconsolata}
+        \item breqn \url{https://ctan.org/pkg/breqn}
+        \item hyperref \url{https://ctan.org/pkg/hyperref}
+        \item multicol \url{https://ctan.org/pkg/multicol}
+        \item tikz \url{https://ctan.org/pkg/tikz}
+        \item changepage \url{https://ctan.org/pkg/changepage}
+        \item verbatimbox \url{https://ctan.org/pkg/verbatimbox}
+    \end{itemize}
+
+    \noindent Während der Entwicklung und beim Schreiben der BLL wurden folgende KI-Werkzeuge verwendet (z.B. für Formattierung von Tex-Elementen oder für das Erstellen von Unit-Tests): 
+    \begin{itemize}
+        \item ChatGPT \url{https://chatgpt.com/}
+        \item Github Copilot \url{https://copilot.github.com/}
+    \end{itemize}
+
+
+    \vspace{1cm}
+
+    \noindent Python Vergleichsalgorithmen
+    
+    \noindent Bubble Sort:
+    \begin{lstlisting}
+    def bubble_sort(arr):
+        n = len(arr)
+        for i in range(n):
+            for j in range(0, n-i-1):
+                if arr[j] > arr[j+1]:
+                    arr[j], arr[j+1] = arr[j+1], arr[j]
+        return arr
+    \end{lstlisting}
+
+    \noindent Fibonacci:
+
+    \begin{lstlisting}
+        def fib(n: int) -> int:
+        if n < 2:
+            return n
+        return fib(n-1) + fib(n-2)
+    \end{lstlisting}
+
+    \noindent Matrizenmultiplikation:
+    \begin{lstlisting}
+    def matrix_multiplication(a: list[list[int]], b: list[list[int]]) 
+        -> list[list[int]]:
+        n = len(a)
+        m = len(b[0])
+        k = len(b)
+        c = [[0 for _ in range(m)] for _ in range(n)]
+        for i in range(n):
+            for j in range(m):
+                for l in range(k):
+                    c[i][j] += a[i][l] * b[l][j]
+        return c
+    \end{lstlisting}
+
+    \vspace{1cm}
+
+    \noindent Die Daten der Benchmarks befinden sich im Ordner \texttt{bll/data} als CSV-Dateien.
+    Weitere Codebeispiele meiner Sprache (inklusive einer kleinen Standardbibliothek) sowie die 
+    verwendeten Benchmark-Algorithmen befinden sich im Ordner \texttt{bll/example}.

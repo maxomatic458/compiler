@@ -1,0 +1,32 @@
+import "../../std/collections/list.mx"
+
+def matrix_multiplicaton(a: *List<List<int>>, b: *List<List<int>>) -> List<List<int>> {
+    let mut result = List::new<List<int>>();
+
+    let a = ~a;
+    let b = ~b;
+
+    let n = a.len;
+    let m = b[0].len;
+    let p = b.len;
+
+    let mut i = 0;
+    while i < n {
+        let mut row = List::new<int>();
+        let mut j = 0;
+        while j < m {
+            let mut sum = 0;
+            let mut k = 0;
+            while k < p {
+                sum = sum + a[i][k] * b[k][j];
+                k = k + 1;
+            }
+            row.push<int>(sum);
+            j = j + 1;
+        }
+        result.push<List<int>>(row);
+        i = i + 1;
+    }
+
+    return result;
+} 

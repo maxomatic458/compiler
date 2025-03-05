@@ -1,0 +1,27 @@
+import "../../std/io.mx"
+import "../../std/net/win/udp.mx"
+
+# auf windows:
+# muss mit ws2_32.lib gelinkt werden
+# clang out.ll -lws2_32
+
+def main() -> int64 {
+    print("IP Addresse des Servers: ");
+    let remote_addr = input();
+
+    let remote = SockAddrV4::from_string(remote_addr + ":50002");
+    let socket = UdpSocket::connect(remote);
+
+    
+    while true {
+        print("Nachricht: ");
+        let msg = input();
+
+        socket.send(msg.list.data, msg.list.cap);
+        println("Nachricht gesendet");
+
+        _free(msg.list.data);
+    }
+
+    return 0;
+}

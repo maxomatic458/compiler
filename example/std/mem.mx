@@ -1,0 +1,21 @@
+extern def malloc(size: int64) -> int64
+extern def calloc(num: int64, size: int64) -> int64
+extern def realloc(ptr: int64, size: int64) -> int64
+extern def free(ptr: int64) -> void
+
+def _malloc<T>() -> *T {
+    return malloc(size_of(T)) as *T;
+}
+
+def _calloc<T>(num: int64) -> *T {
+    return calloc(num, size_of(T)) as *T;
+}
+
+def _realloc<T>(ptr: *T, size: int64) -> *T {
+    return realloc(ptr as int64, size) as *T;
+}
+
+def _free<T>(ptr: *T) -> void {
+    free(ptr as int64);
+}
+

@@ -1,0 +1,34 @@
+extern def calloc(num: int64, size: int64) -> int64
+
+def _calloc<T>(num: int64) -> *T {
+    return calloc(num, size_of(T)) as *T
+}
+
+class List<T> {
+    data: *T,
+    len: int64,
+    cap: int64,
+}
+
+def with_capacity<T>(cap: int64) for List -> List<T> {
+    return List {
+        data: _calloc<T>(cap * size_of(T)),
+        len: 0,
+        cap: cap,
+    }
+}
+
+def swap<T>(self, i: int64, j: int64) for List<T> {
+    let foo = 0;
+    # let tmp = self[i];
+    #self[i] = self[j];
+    #self[j] = tmp;
+}
+
+def main() -> int64 {
+    let my_list: List<int64> = List::with_capacity<int64>(10);
+
+    my_list.swap(0, 1);
+
+    return 0;
+}

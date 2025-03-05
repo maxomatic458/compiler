@@ -1,0 +1,51 @@
+import "../io.mx"
+
+class SockAddrV4 {
+    ip: [int8; 4], 
+    port: int16,
+}
+
+def to_string(self) for SockAddrV4 -> String {
+    return self.ip[0].to_string_unsigned() 
+    + "." + self.ip[1].to_string_unsigned() 
+    + "." + self.ip[2].to_string_unsigned() 
+    + "." + self.ip[3].to_string_unsigned() 
+    + ":" + self.port.to_string_unsigned()
+}
+
+def ip(self) for SockAddrV4 -> String {
+    return self.ip[0].to_string_unsigned() 
+    + "." + self.ip[1].to_string_unsigned() 
+    + "." + self.ip[2].to_string_unsigned() 
+    + "." + self.ip[3].to_string_unsigned()
+}
+
+def port(self) for SockAddrV4 -> int16 {
+    return self.port;
+}
+
+def from_string(s: String) for SockAddrV4 -> SockAddrV4 {
+    let parts = s.split(58 as int8); # ':'
+    if parts.len != 2 {
+        panic("Invalid SockAddrV4 string");
+    }
+
+    let ip_parts = parts[0].split(46 as int8); # '.'
+    if ip_parts.len != 4 {
+        panic("Invalid SockAddrV4 string");
+    }
+
+    let ip = [
+        ip_parts[0].parse_int() as int8,
+        ip_parts[1].parse_int() as int8,
+        ip_parts[2].parse_int() as int8,
+        ip_parts[3].parse_int() as int8,
+    ];
+
+    let port = parts[1].parse_int() as int16;
+
+    return SockAddrV4 {
+        ip: ip,
+        port: port,
+    }
+}

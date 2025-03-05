@@ -1,0 +1,58 @@
+extern def Sleep(s: int64) -> void
+extern def time(n: *int64) -> *int64
+
+class ULARGE_INTEGER {
+    LowPart: int32,
+    HighPart: int32,
+    QuadPart: int64,
+}
+
+def new() for ULARGE_INTEGER -> ULARGE_INTEGER {
+    return ULARGE_INTEGER {
+        LowPart: 0 as int32,
+        HighPart: 0 as int32,
+        QuadPart: 0,
+    }
+}
+
+class FileTime {
+    dwLowDateTime: int32,
+    dwHighDateTime: int32,
+}
+
+extern def GetSystemTimeAsFileTime(lpSystemTimeAsFileTime: *FileTime) -> void
+
+def new() for FileTime -> FileTime {
+    return FileTime {
+        dwLowDateTime: 0 as int32,
+        dwHighDateTime: 0 as int32,
+    }
+}
+
+def unix_millis() -> int64 {
+    let ft = FileTime::new();
+    GetSystemTimeAsFileTime(&ft);
+
+    let high = ft.dwHighDateTime;
+    let low = ft.dwLowDateTime;
+
+    let time = high as int64 * 4294967296 + low as int64;
+
+    let millis = time / 10000;
+    return millis as int64;
+
+}
+
+def unix_secs() -> int64 {
+    let time = &0;
+    time(time);
+    return ~time;
+}
+
+def sleep_ms(ms: int64) -> void {
+    Sleep(ms);
+}
+
+def sleep(s: int64) -> void {
+    Sleep(s * 1000);
+}

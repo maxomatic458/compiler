@@ -1,0 +1,121 @@
+import "../mem.mx"
+
+class List<T> {
+    data: *T,
+    len: int64,
+    cap: int64,
+}
+
+def new<T>() for List -> List<T> {
+    let DEFAULT_CAP = 16;
+    return List {
+        data: _calloc<T>(DEFAULT_CAP * size_of(T)),
+        len: 0,
+        cap: DEFAULT_CAP,
+    }
+}
+
+def with_capacity<T>(cap: int64) for List -> List<T> {
+    return List {
+        data: _calloc<T>(cap * size_of(T)),
+        len: 0,
+        cap: cap,
+    }
+}
+
+def push<T>(self, value: T) for List<T> {
+    if self.len == self.cap {
+        self.cap = self.cap * 2;
+        let new_data: *T = _realloc<T>(self.data, self.cap * size_of(T));
+        self.data = new_data;
+    }
+
+    let offset = self.len * size_of(T);
+    let mut start_ptr = (self.data as int64 + offset) as *T;
+
+    ~start_ptr = value;
+    self.len = self.len + 1;
+}
+
+def idx<T>(self, index: int64) for List<T> -> *T {
+    let offset = index * size_of(T);
+    let start_ptr = (self.data as int64 + offset) as *T;
+    return start_ptr;
+}
+
+def insert<T>(self, index: int64, value: T) for List<T> {
+    if self.len == self.cap {
+        self.cap = self.cap * 2;
+        let new_data: *T = _realloc<T>(self.data, self.cap * size_of(T));
+        self.data = new_data;
+    }
+
+    let offset = index * size_of(T);
+    let mut start_ptr = (self.data as int64 + offset) as *T;
+
+    let mut i = self.len;
+    while i > index {
+        let prev = (self.data as int64 + (i - 1) * size_of(T)) as *T;
+        let mut next = (self.data as int64 + i * size_of(T)) as *T;
+        ~next = ~prev;
+        i = i - 1;
+    }
+
+    ~start_ptr = value;
+    self.len = self.len + 1;
+}
+
+def remove<T>(self, index: int64) for List<T> {
+    let offset = index * size_of(T);
+    let start_ptr = (self.data as int64 + offset) as *T;
+
+    let mut i = index;
+    while i < self.len - 1 {
+        let next = (self.data as int64 + (i + 1) * size_of(T)) as *T;
+        let mut prev = (self.data as int64 + i * size_of(T)) as *T;
+        ~prev = ~next;
+        i = i + 1;
+    }
+
+    self.len = self.len - 1;
+}
+
+def extend<T>(self, other: List<T>) for List<T> {
+    let mut i = 0;
+    while i < other.len {
+        self.push<T>(other[i]);
+        i = i + 1;
+    }
+}
+
+def swap<T>(self, i: int64, j: int64) for List<T> {
+    let tmp = self[i];
+    self[i] = self[j];
+    self[j] = tmp;
+}
+
+def clone<T>(self) for List<T> -> List<T> {
+    let new_list = List::with_capacity<T>(self.cap);
+    let mut i = 0;
+    while i < self.len {
+        new_list.push<T>(self[i]);
+        i = i + 1;
+    }
+    return new_list;
+}
+
+def pop<T>(self) for List<T> -> T {
+    let value = self[self.len - 1];
+    self.len = self.len - 1;
+    return value;
+}
+
+def reverse<T>(self) for List<T> {
+    let mut i = 0;
+    let mut j = self.len - 1;
+    while i < j {
+        self.swap<T>(i, j);
+        i = i + 1;
+        j = j - 1;
+    }
+}

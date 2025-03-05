@@ -1,0 +1,107 @@
+import "string.mx"
+import "io.mx"
+
+extern def fopen(file: *int8, mode: *int8) -> *IOBuf
+extern def fclose(file: *IOBuf) -> int64
+extern def fgetc(file: *IOBuf) -> int8
+extern def fputc(c: int8, file: *IOBuf) -> int64
+
+class FileMode {
+    read: bool,
+    write: bool,
+}
+
+def read() for FileMode -> FileMode {
+    return FileMode {
+        read: true,
+        write: false,
+    };
+}
+
+def write() for FileMode -> FileMode {
+    return FileMode {
+        read: false,
+        write: true,
+    };
+}
+
+class File {
+    file: *IOBuf,
+    is_open: bool,
+    mode: FileMode,
+}
+
+
+def open(path: String, mode: FileMode) for File -> File {
+    let string_mode = {
+        if mode.read {
+            return "r".to_c_string();
+        } else if mode.write {
+            return "w".to_c_string();
+        } else {
+            panic("Invalid file mode");
+            return 0 as *int8;
+        }
+    };
+
+    let file = fopen(path.to_c_string(), string_mode);
+    if file as int64 == 0 {
+        panic("Failed to open file");
+    }
+
+    return File {
+        file: file,
+        is_open: true,
+        mode: mode,
+    };
+}
+
+def create(path: String) for File -> int64 {
+    let file = File::open(path, FileMode::write());
+
+    fclose(file.file);
+    return 0;
+}
+
+def close(self) for File -> int64 {
+    if self.is_open {
+        fclose(self.file);
+        self.is_open = false;
+        return 0;
+    } else {
+        panic("File is already closed");
+        return -1;
+    }
+}
+
+def read_to_bytes(self) for File -> List<int8> {
+    let mut buf = List::new<int8>();
+    let mut c = fgetc(self.file);
+    while c != (-1) as int8 {
+        buf.push(c);
+        c = fgetc(self.file);
+    }
+    return buf;
+} 
+
+def read_to_string(self) for File -> String {
+    return String {
+        list: self.read_to_bytes(),
+    };
+}
+
+def write_bytes(self, bytes: List<int8>) for File {
+    if self.mode.write == false {
+        panic("File is not open for writing");
+    }
+
+    let mut i = 0;
+    while i < bytes.len {
+        fputc(bytes[i], self.file);
+        i = i + 1;
+    }
+}
+
+def write_string(self, s: String) for File {
+    self.write_bytes(s.list);
+}

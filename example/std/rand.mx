@@ -1,0 +1,10 @@
+extern def rand() -> int64
+extern def srand(seed: int64) -> void
+
+def rand_int(start: int64, end: int64) -> int64 {
+    return start + rand() % (end + 1 - start);
+}
+
+def seed(seed: int64) -> void {
+    srand(seed);
+}

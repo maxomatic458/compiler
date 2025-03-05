@@ -1,0 +1,63 @@
+\documentclass[12pt]{article}
+\usepackage[ngerman]{babel}
+\usepackage{upquote}
+\usepackage{listings}
+\usepackage{inconsolata}
+\usepackage{breqn}
+\usepackage{hyperref}
+\renewcommand{\ttdefault}{zi4}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{changepage}  
+\usepackage{verbatimbox} 
+\selectlanguage{ngerman}
+\usetikzlibrary{positioning}
+\mathchardef\hyphenmathcode=\mathcode`\-
+
+\let\origlstlisting=\lstlisting
+\let\endoriglstlisting=\endlstlisting
+\renewenvironment{lstlisting}
+    {\mathcode`\-=\hyphenmathcode
+     \everymath{}\mathsurround=0pt\origlstlisting}
+    {\endoriglstlisting}
+
+    % change the code font to inconsolata
+    \lstset{basicstyle=\small\ttfamily, showstringspaces=false}
+
+\begin{document}
+\begin{titlepage}
+    \begin{center}
+        {\large \bf Besondere Lernleistung im Fach Informatik}\\[8mm]
+        {\Huge \bf Entwicklung einer eigenen Programmiersprache}\\[1cm]
+
+    
+
+        
+    \end{center}
+    \vfill
+    \begin{minipage}[t]{0.4\textwidth}
+        \begin{flushleft}
+            \begin{tabular}{lll}
+                \textbf{Autor:} & ... & \\
+                \textbf{Kurs:} & MSS 12 Stammkurs Englisch & \\
+                \textbf{Lehrer:} & ...& \\
+                \textbf{Abgabedatum:} & 03.07.2024 & \\
+            \end{tabular}
+        \end{flushleft}
+    \end{minipage}
+\end{titlepage}
+\tableofcontents
+\newpage
+
+    
+\include{sections/einleitung}
+\include{sections/sprache}
+\include{sections/entwicklung}
+\include{sections/fazit}
+
+\include{sections/anhang}
+
+
+
+\end{document}

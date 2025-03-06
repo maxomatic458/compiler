@@ -22,10 +22,10 @@ If a installation of clang (>= 16) is available the compiler will output a execu
 ## Language
 
 ### Syntax and Semantics
-The syntax is inspired by Python and C.
+The syntax is inspired by Python and Rust.
 
 ```py
-use "std/io.mx"
+import "std/io.mx"
 
 class Foo { # class
     inner: int64,
@@ -35,17 +35,17 @@ def new() for Foo -> Foo { # static method
     return Foo { inner: 0 };
 }
 
-def get_inner(self) -> int64 { # method
+def get_inner(self) for Foo -> int64 { # method
     return self.inner;
 }
 
 def main() -> int64 { # function + entry point
 
-    let mut foo = new(); # variable declaration
+    let mut foo = Foo::new(); # variable declaration
 
     foo.inner = 0; # field reassignment
 
-    while foo.inner < 10 { # while loop
+    while (foo.inner) < 10 { # while loop
         foo.inner = foo.inner + 1;
     }
 

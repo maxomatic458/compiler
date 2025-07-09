@@ -6,6 +6,7 @@ The paper is written in german and can be found in the `bll/` directory.
 The compiler is written in Rust and uses LLVM IR as target language.
 If a installation of clang (>= 16) is available the compiler will output a executable binary.
 
+A web demo of the compiler is available at https://compiler-demo.pages.dev/
 ## Usage
 ```
 ./compiler <input-file>

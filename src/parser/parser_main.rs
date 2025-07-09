@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -5,7 +6,6 @@ use std::sync::Arc;
 
 use std::sync::RwLock;
 
-use ahash::AHashMap;
 use itertools::peek_nth;
 use itertools::Itertools;
 use itertools::PeekNth;
@@ -59,7 +59,7 @@ impl Parser {
 
     pub fn with_dependency_cache(
         mut self,
-        dependencies: Arc<RwLock<AHashMap<PathBuf, Program>>>,
+        dependencies: Arc<RwLock<HashMap<PathBuf, Program>>>,
     ) -> Self {
         self.program.dependency_cache = dependencies;
         self

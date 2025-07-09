@@ -1,11 +1,11 @@
-use ahash::AHashMap;
-use indexmap::IndexMap;
+use std::collections::HashMap;
 
 use crate::lexer::position::{Span, Spanned};
+use ordermap::OrderMap;
 
 use super::ast::{DataType, Function, FunctionParam};
 
-pub fn get_builtin_functions() -> IndexMap<String, Spanned<Function>> {
+pub fn get_builtin_functions() -> OrderMap<String, Spanned<Function>> {
     let size_of = Function {
         display_name: Spanned {
             value: "size_of".to_string(),
@@ -41,11 +41,11 @@ pub fn get_builtin_functions() -> IndexMap<String, Spanned<Function>> {
         method_of: None,
         is_builtin: true,
         // generics: vec![],
-        generic_subtypes: AHashMap::new(),
+        generic_subtypes: HashMap::new(),
         trait_of: None,
     };
 
-    let mut map = IndexMap::new();
+    let mut map = OrderMap::new();
     map.insert(
         size_of.display_name.value.clone(),
         Spanned {

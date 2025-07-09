@@ -1,5 +1,5 @@
-use ahash::{AHashMap, AHashSet};
 use itertools::Itertools;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     lexer::{
@@ -48,7 +48,7 @@ impl Parser {
                 name: name.clone(),
                 fields,
                 // methods: vec![],
-                subtypes: AHashMap::new(),
+                subtypes: HashMap::new(),
                 generics,
                 subtype_of: None,
                 is_generic,
@@ -67,7 +67,7 @@ impl Parser {
                 DataTypeInfo {
                     parent_type: class.clone(),
                     methods: vec![],
-                    traits: AHashSet::new(),
+                    traits: HashSet::new(),
                 },
             );
 

@@ -1,6 +1,5 @@
-use std::sync::atomic::AtomicU64;
+use std::{collections::HashMap, sync::atomic::AtomicU64};
 
-use ahash::AHashMap;
 use itertools::Itertools;
 
 use super::llvm_instructions::{ToIR, IR};
@@ -25,7 +24,7 @@ impl ToIR for ComputedExpression {
 pub struct CodeGenerator {
     pub program: Program,
     pub variable_counter: AtomicU64,
-    pub variable_map: AHashMap<String, IRVariable>,
+    pub variable_map: HashMap<String, IRVariable>,
     pub source_code: Option<String>,
 }
 
@@ -34,7 +33,7 @@ impl CodeGenerator {
         CodeGenerator {
             program,
             variable_counter: AtomicU64::new(0),
-            variable_map: AHashMap::new(),
+            variable_map: HashMap::new(),
             source_code: None,
         }
     }

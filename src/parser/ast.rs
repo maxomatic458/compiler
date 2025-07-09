@@ -1,8 +1,7 @@
-use ahash::{AHashMap, AHashSet};
 use ordermap::OrderSet;
 
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashMap, HashSet},
     fmt::Display,
     hash::Hash,
     mem::size_of,
@@ -15,8 +14,8 @@ use crate::lexer::{
     tokens::Literal,
 };
 use derive_more::Display;
-use indexmap::IndexMap;
 use itertools::Itertools;
+use ordermap::OrderMap;
 
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
@@ -33,18 +32,18 @@ type TraitInfo = (Trait, Vec<DataType>, Option<String>, DataType);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DependencyGraph {
-    pub dependencies: AHashMap<PathBuf, Vec<PathBuf>>,
+    pub dependencies: HashMap<PathBuf, Vec<PathBuf>>,
 }
 
 // https://github.com/jDomantas/plank/blob/master/plank-syntax/src/ast.rs
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Program {
-    pub data_types: IndexMap<String, DataTypeInfo>,
-    pub custom_types: IndexMap<String, Spanned<DataType>>,
-    pub functions: IndexMap<String, Spanned<Function>>,
+    pub data_types: OrderMap<String, DataTypeInfo>,
+    pub custom_types: OrderMap<String, Spanned<DataType>>,
+    pub functions: OrderMap<String, Spanned<Function>>,
     pub require_main: bool,
     #[serde(skip)]
-    pub dependency_cache: Arc<RwLock<AHashMap<PathBuf, Program>>>,
+    pub dependency_cache: Arc<RwLock<HashMap<PathBuf, Program>>>,
     #[serde(skip)]
     pub import_queue: Vec<PathBuf>,
     #[serde(skip)]
@@ -54,11 +53,11 @@ pub struct Program {
 impl Default for Program {
     fn default() -> Self {
         Program {
-            data_types: IndexMap::new(),
-            custom_types: IndexMap::new(),
+            data_types: OrderMap::new(),
+            custom_types: OrderMap::new(),
             functions: get_builtin_functions(),
             require_main: false,
-            dependency_cache: Arc::new(RwLock::new(AHashMap::new())),
+            dependency_cache: Arc::new(RwLock::new(HashMap::new())),
             import_queue: vec![],
             source_code: vec![],
         }
@@ -99,7 +98,7 @@ impl Program {
             .unwrap_or(DataTypeInfo {
                 parent_type: _type.clone(),
                 methods: vec![],
-                traits: AHashSet::new(),
+                traits: HashSet::new(),
                 // export:
             })
     }
@@ -110,7 +109,7 @@ impl Program {
             .or_insert_with(|| DataTypeInfo {
                 parent_type: _type.clone(),
                 methods: vec![],
-                traits: AHashSet::new(),
+                traits: HashSet::new(),
             })
     }
 
@@ -142,7 +141,7 @@ pub struct Function {
     pub is_extern: bool,
     pub method_of: Option<DataType>,
     pub trait_of: Option<DataType>,
-    pub generic_subtypes: AHashMap<Vec<DataType>, Function>,
+    pub generic_subtypes: HashMap<Vec<DataType>, Function>,
     // pub generics: Vec<Spanned<DataType>>,
     pub is_builtin: bool,
 }
@@ -206,7 +205,7 @@ impl Function {
             },
             is_extern: false,
             method_of: None,
-            generic_subtypes: AHashMap::new(),
+            generic_subtypes: HashMap::new(),
             is_builtin: false,
             trait_of: None,
         }
@@ -258,7 +257,7 @@ impl Function {
 
     pub fn subtype(
         &self,
-        generic_map: &AHashMap<String, DataType>,
+        generic_map: &HashMap<String, DataType>,
         caller: Option<&DataType>,
         parser: &mut Program,
         handle_traits: bool,
@@ -343,7 +342,7 @@ impl Function {
             },
             is_extern: self.is_extern,
             method_of,
-            generic_subtypes: AHashMap::new(),
+            generic_subtypes: HashMap::new(),
             is_builtin: self.is_builtin,
             trait_of: None,
         }
@@ -513,7 +512,7 @@ impl Default for Function {
             },
             is_extern: false,
             method_of: None,
-            generic_subtypes: AHashMap::new(),
+            generic_subtypes: HashMap::new(),
             is_builtin: false,
             name: "".to_string(),
             trait_of: None,
@@ -659,7 +658,7 @@ pub struct Block {
 }
 
 impl Block {
-    pub fn generics_set(&self) -> AHashSet<DataType> {
+    pub fn generics_set(&self) -> HashSet<DataType> {
         self.generics.iter().map(|g| g.value.clone()).collect()
     }
 
@@ -937,10 +936,10 @@ pub const TRAIT_NAMES_MAP: phf::Map<&str, Trait> = phf::phf_map!(
     "as" => Trait::Cast,
 );
 
-fn get_default_implementation(type_: &DataType) -> Option<AHashSet<TraitInfo>> {
+fn get_default_implementation(type_: &DataType) -> Option<HashSet<TraitInfo>> {
     match type_ {
         DataType::Integer8 | DataType::Integer32 | DataType::Integer64 | DataType::Float => {
-            Some(AHashSet::from([
+            Some(HashSet::from([
                 (
                     Trait::Add,
                     vec![type_.to_owned(), type_.to_owned()],
@@ -1033,7 +1032,7 @@ fn get_default_implementation(type_: &DataType) -> Option<AHashSet<TraitInfo>> {
                 ),
             ]))
         }
-        DataType::Boolean => Some(AHashSet::from([
+        DataType::Boolean => Some(HashSet::from([
             (
                 Trait::Equal,
                 vec![type_.to_owned(), type_.to_owned()],
@@ -1065,7 +1064,7 @@ fn get_default_implementation(type_: &DataType) -> Option<AHashSet<TraitInfo>> {
                 DataType::Boolean,
             ),
         ])),
-        DataType::Array { value_type, .. } => Some(AHashSet::from([(
+        DataType::Array { value_type, .. } => Some(HashSet::from([(
             Trait::Index,
             vec![type_.to_owned(), DataType::Integer64],
             None,
@@ -1265,7 +1264,7 @@ pub struct DataTypeInfo {
     pub methods: Vec<String>,
     pub parent_type: DataType,
     // TODO: hashmap?
-    pub traits: AHashSet<TraitInfo>,
+    pub traits: HashSet<TraitInfo>,
     // pub export: bool,
 }
 
@@ -1428,7 +1427,10 @@ impl DataType {
         matches!(
             (self, to),
             (
-                DataType::Integer8 | DataType::Integer16 | DataType::Integer32 | DataType::Integer64,
+                DataType::Integer8
+                    | DataType::Integer16
+                    | DataType::Integer32
+                    | DataType::Integer64,
                 DataType::Pointer(_)
             ) | (DataType::Pointer(_), DataType::Pointer(_))
                 | (DataType::Pointer(_), DataType::Integer64,)
@@ -1445,12 +1447,18 @@ impl DataType {
                         | DataType::Boolean,
                 )
                 | (
-                    DataType::Integer8 | DataType::Integer16 | DataType::Integer32 | DataType::Integer64,
+                    DataType::Integer8
+                        | DataType::Integer16
+                        | DataType::Integer32
+                        | DataType::Integer64,
                     DataType::Float,
                 )
                 | (
                     DataType::Float,
-                    DataType::Integer8 | DataType::Integer16 | DataType::Integer32 | DataType::Integer64,
+                    DataType::Integer8
+                        | DataType::Integer16
+                        | DataType::Integer32
+                        | DataType::Integer64,
                 )
         )
 
@@ -1537,7 +1545,7 @@ pub struct CustomDataType {
     pub name: String,
     pub fields: Spanned<Vec<FunctionParam>>,
     // pub methods: Vec<String>,
-    pub subtypes: AHashMap<Vec<DataType>, CustomDataType>,
+    pub subtypes: HashMap<Vec<DataType>, CustomDataType>,
     pub generics: Vec<Spanned<DataType>>,
     pub subtype_of: Option<String>,
     // ```
@@ -1583,7 +1591,7 @@ impl PartialEq for CustomDataType {
 impl Eq for CustomDataType {}
 
 impl CustomDataType {
-    pub fn generics_set(&self) -> AHashSet<DataType> {
+    pub fn generics_set(&self) -> HashSet<DataType> {
         self.generics.iter().map(|g| g.value.clone()).collect()
     }
 
@@ -1593,7 +1601,7 @@ impl CustomDataType {
         program: &mut Program,
         subtype_traits: bool,
     ) -> CustomDataType {
-        let generic_map: AHashMap<String, DataType> = self
+        let generic_map: HashMap<String, DataType> = self
             .generics
             .iter()
             .map(|g| {
@@ -1666,7 +1674,7 @@ impl CustomDataType {
             name,
             fields,
             // methods: self.methods.clone(),
-            subtypes: AHashMap::new(),
+            subtypes: HashMap::new(),
             generics: vec![],
             subtype_of: Some(self.name.clone()),
             is_generic: false,
@@ -1681,7 +1689,7 @@ impl CustomDataType {
         let mut new_data_type_info = DataTypeInfo {
             methods: data_type_info.methods.clone(),
             parent_type: DataType::Custom(out.clone()),
-            traits: AHashSet::new(),
+            traits: HashSet::new(),
         };
 
         if subtype_traits {

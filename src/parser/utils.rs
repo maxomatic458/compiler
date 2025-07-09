@@ -1,5 +1,5 @@
-use ahash::AHashMap;
 use itertools::Itertools;
+use std::collections::HashMap;
 
 use crate::{
     lexer::position::{Span, Spanned},
@@ -22,7 +22,7 @@ where
 
 pub fn specify_generics(
     type_settables: &mut [DataTypeSettable],
-    generics: &AHashMap<String, DataType>,
+    generics: &HashMap<String, DataType>,
     parser: &mut Program,
     handle_traits: bool,
 ) {
@@ -124,7 +124,7 @@ fn find_specific_types(generic: CustomDataType, specific: CustomDataType) -> Opt
     }
 
     let mut out = vec![];
-    let mut generics_to_specifics = AHashMap::new();
+    let mut generics_to_specifics = HashMap::new();
 
     let generic_types = generic.clone().types();
     let specific_types = specific.clone().types();
@@ -151,9 +151,9 @@ fn find_specific_types(generic: CustomDataType, specific: CustomDataType) -> Opt
 pub fn handle_generics(
     args: &[DataType],
     params: &[DataType],
-    annotations: Option<&AHashMap<String, DataType>>,
-) -> (Vec<DataType>, AHashMap<String, DataType>) {
-    let mut generics_to_types = AHashMap::new();
+    annotations: Option<&HashMap<String, DataType>>,
+) -> (Vec<DataType>, HashMap<String, DataType>) {
+    let mut generics_to_types = HashMap::new();
     let mut generics_order = Vec::new();
 
     if let Some(annotations) = annotations {
@@ -224,7 +224,7 @@ pub fn handle_generics(
 /// bzw subtyp bilden
 pub fn handle_nested_generic_functions(
     _block: &mut Block,
-    _generics: &AHashMap<String, DataType>,
+    _generics: &HashMap<String, DataType>,
     _program: &mut Program,
 ) {
     todo!()
@@ -250,7 +250,7 @@ mod tests {
             DataTypeSettable::DataType(&mut binding4),
         ];
 
-        let mut generics = AHashMap::new();
+        let mut generics = HashMap::new();
         generics.insert("T".to_string(), DataType::Integer64);
         generics.insert("U".to_string(), DataType::Boolean);
 
@@ -277,7 +277,7 @@ mod tests {
             DataTypeSettable::DataType(&mut binding3),
         ];
 
-        let mut generics = AHashMap::new();
+        let mut generics = HashMap::new();
         generics.insert("T".to_string(), DataType::Integer64);
     }
 
@@ -295,7 +295,7 @@ mod tests {
 
         assert_eq!(result, vec![DataType::Integer64, DataType::Boolean]);
 
-        let mut expected_generics = AHashMap::new();
+        let mut expected_generics = HashMap::new();
         expected_generics.insert("T".to_string(), DataType::Integer64);
         expected_generics.insert("U".to_string(), DataType::Boolean);
 
@@ -322,7 +322,7 @@ mod tests {
 
         assert_eq!(result, vec![DataType::Integer64, DataType::Boolean]);
 
-        let mut expected_generics = AHashMap::new();
+        let mut expected_generics = HashMap::new();
         expected_generics.insert("T".to_string(), DataType::Integer64);
         expected_generics.insert("U".to_string(), DataType::Boolean);
 
@@ -341,7 +341,7 @@ mod tests {
 
         assert_eq!(result, vec![DataType::Integer64]);
 
-        let mut expected_generics = AHashMap::new();
+        let mut expected_generics = HashMap::new();
         expected_generics.insert("E".to_string(), DataType::Integer64);
 
         assert_eq!(generics, expected_generics);
@@ -357,14 +357,14 @@ mod tests {
             DataType::Pointer(Box::new(DataType::Generic("T".to_string()))),
         ];
 
-        let mut annotations = AHashMap::new();
+        let mut annotations = HashMap::new();
         annotations.insert("T".to_string(), DataType::Integer64);
 
         let (result, generics) = handle_generics(&args, &params, Some(&annotations));
 
         assert_eq!(result, vec![DataType::Integer64]);
 
-        let mut expected_generics = AHashMap::new();
+        let mut expected_generics = HashMap::new();
         expected_generics.insert("T".to_string(), DataType::Integer64);
 
         assert_eq!(generics, expected_generics);
@@ -411,7 +411,7 @@ mod tests {
                     ],
                     span: Span::default(),
                 },
-                subtypes: AHashMap::new(),
+                subtypes: HashMap::new(),
                 generics: vec![],
                 subtype_of: Some("List".to_string()),
                 is_generic: false,
@@ -457,7 +457,7 @@ mod tests {
                 ],
                 span: Span::default(),
             },
-            subtypes: AHashMap::new(),
+            subtypes: HashMap::new(),
             generics: vec![Spanned {
                 value: DataType::Generic("T".to_string()),
                 span: Span::default(),
@@ -470,7 +470,7 @@ mod tests {
 
         assert_eq!(result, vec![DataType::Integer64]);
 
-        let mut expected = AHashMap::new();
+        let mut expected = HashMap::new();
         expected.insert("T".to_string(), DataType::Integer64);
 
         assert_eq!(generics, expected);

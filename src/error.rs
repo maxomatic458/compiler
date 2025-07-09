@@ -4,6 +4,7 @@ use codespan_reporting::files::SimpleFiles;
 use codespan_reporting::term::termcolor::{ColorChoice, StandardStream};
 use core::fmt::Debug;
 use std::fmt::Display;
+use termcolor::Ansi;
 
 pub fn emit_error(file_name: &str, code: &str, err: &Spanned<Box<dyn CompilerError>>) {
     let mut files = SimpleFiles::new();
@@ -27,6 +28,37 @@ pub fn emit_error(file_name: &str, code: &str, err: &Spanned<Box<dyn CompilerErr
     };
 
     codespan_reporting::term::emit(&mut writer.lock(), &config, &files, &diagnostic).unwrap();
+}
+
+pub fn error_as_string(
+    file_name: &str,
+    code: &str,
+    err: &Spanned<Box<dyn CompilerError>>,
+) -> String {
+    let mut files = SimpleFiles::new();
+
+    let file_id = files.add(file_name, code);
+
+    let diagnostic = Diagnostic::error()
+        .with_message(err.value.name())
+        .with_code(err.value.id().to_string())
+        .with_labels(vec![Label::primary(
+            file_id,
+            err.span.start.abs..err.span.end.abs,
+        )
+        .with_message(err.value.err_msg())]);
+
+    let mut writer = Ansi::new(Vec::new());
+    let config = codespan_reporting::term::Config {
+        before_label_lines: 2,
+        after_label_lines: 2,
+        ..Default::default()
+    };
+
+    codespan_reporting::term::emit(&mut writer, &config, &files, &diagnostic).unwrap();
+
+    String::from_utf8(writer.into_inner())
+        .unwrap_or_else(|_| "Error formatting error message".to_string())
 }
 
 pub trait CompilerError: Debug + Display + std::error::Error + Send + Sync {

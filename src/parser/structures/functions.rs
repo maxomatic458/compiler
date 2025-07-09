@@ -14,8 +14,8 @@ use crate::{
         // utils::,
     },
 };
-use ahash::AHashMap;
 use itertools::Itertools;
+use std::collections::HashMap;
 
 use std::collections::BTreeMap;
 
@@ -107,7 +107,7 @@ impl Parser {
                 return_type,
                 is_extern,
                 method_of: parent_class.clone().map(|c| c.value),
-                generic_subtypes: AHashMap::new(),
+                generic_subtypes: HashMap::new(),
                 is_builtin: false,
                 trait_of: None,
             };
@@ -607,7 +607,7 @@ impl Parser {
                         });
                     }
 
-                    let mut annotation_map: AHashMap<String, DataType> = AHashMap::new();
+                    let mut annotation_map: HashMap<String, DataType> = HashMap::new();
 
                     for (annotated, return_type_generic_name) in
                         generic_annotations.iter().zip(return_type_generics.iter())

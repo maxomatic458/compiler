@@ -49,6 +49,6 @@ impl Span {
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Serialize, Deserialize, Hash)]
 pub struct Spanned<T> {
     pub value: T,
-    #[serde(skip_serializing)]
+    // #[serde(skip_serializing)]
     pub span: Span,
 }
